@@ -3,8 +3,12 @@ import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from predictor import predict
-from schemas import PredictRequest, PredictResponse
+try:
+    from .predictor import predict
+    from .schemas import PredictRequest, PredictResponse
+except ImportError:
+    from predictor import predict
+    from schemas import PredictRequest, PredictResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

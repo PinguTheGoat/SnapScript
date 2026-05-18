@@ -3,7 +3,10 @@ import re
 
 import torch
 
-from model_loader import DEVICE, MODEL, TOKENIZER
+try:
+    from .model_loader import DEVICE, MODEL, TOKENIZER
+except ImportError:
+    from model_loader import DEVICE, MODEL, TOKENIZER
 
 logger = logging.getLogger(__name__)
 
