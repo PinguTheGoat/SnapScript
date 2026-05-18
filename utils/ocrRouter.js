@@ -1,7 +1,14 @@
-import TextRecognition from '@react-native-ml-kit/text-recognition';
-
 import { preprocessImage } from './imagePreprocessor';
 import { extractTextFromImage } from './googleVisionApi';
+
+let TextRecognition;
+try {
+  // Lazy-load native module; may be unavailable in Expo Go
+  // eslint-disable-next-line global-require
+  TextRecognition = require('@react-native-ml-kit/text-recognition').default;
+} catch (e) {
+  TextRecognition = null;
+}
 
 const HANDWRITING_CONFIDENCE_THRESHOLD = 0.85;
 
@@ -33,11 +40,25 @@ export async function extractText(imageInput, googleVisionApiKey, mode = 'auto')
     }
 
     if (normalizedMode === 'printed') {
-      const recognition = await TextRecognition.recognize(processedImage.uri);
+      if (TextRecognition && TextRecognition.recognize) {
+        try {
+          const recognition = await TextRecognition.recognize(processedImage.uri);
+          return {
+            text: String(recognition?.text || '').trim(),
+            type: 'printed',
+            confidence: 0.95,
+          };
+        } catch (err) {
+          // Fall through to cloud fallback
+        }
+      }
+
+      // fallback to cloud OCR when native module unavailable or fails
+      const visionResult = await extractTextFromImage(processedImage.base64 || '', googleVisionApiKey);
       return {
-        text: String(recognition?.text || '').trim(),
+        text: visionResult.text,
         type: 'printed',
-        confidence: 0.95,
+        confidence: visionResult.confidence,
       };
     }
 
@@ -51,18 +72,32 @@ export async function extractText(imageInput, googleVisionApiKey, mode = 'auto')
       };
     }
 
-    const recognition = await TextRecognition.recognize(processedImage.uri);
+    if (TextRecognition && TextRecognition.recognize) {
+      try {
+        const recognition = await TextRecognition.recognize(processedImage.uri);
+        return {
+          text: String(recognition?.text || '').trim(),
+          type: 'printed',
+          confidence: imageType.confidence,
+        };
+      } catch (err) {
+        // fall back to cloud OCR below
+      }
+    }
+
+    const fallbackVision = await extractTextFromImage(processedImage.base64 || '', googleVisionApiKey);
     return {
-      text: String(recognition?.text || '').trim(),
+      text: fallbackVision.text,
       type: 'printed',
-      confidence: imageType.confidence,
+      confidence: fallbackVision.confidence,
     };
   } catch (error) {
-    const recognition = await TextRecognition.recognize(processedImage.uri).catch(() => ({ text: '' }));
+    // If anything goes wrong, try cloud OCR as a safe fallback
+    const visionResult = await extractTextFromImage(processedImage.base64 || '', googleVisionApiKey).catch(() => ({ text: '', confidence: 0 }));
     return {
-      text: String(recognition?.text || '').trim(),
+      text: visionResult.text || '',
       type: normalizedMode === 'handwritten' ? 'handwritten' : 'printed',
-      confidence: 0.5,
+      confidence: visionResult.confidence || 0.0,
     };
   }
 }
