@@ -1,0 +1,61 @@
+﻿{
+    "id":  "ad01e167-265c-4292-9bd1-c683290d4812",
+    "createdAt":  "2026-05-18T03:54:52.888Z",
+    "runtimeVersion":  "exposdk:54.0.0",
+    "launchAsset":  {
+                        "key":  "bundle",
+                        "contentType":  "application/javascript",
+                        "url":  "https://snapscript-production-e25b.up.railway.app:8081/index.bundle?platform=ios\u0026dev=true\u0026hot=false\u0026lazy=true\u0026transform.engine=hermes\u0026transform.bytecode=1\u0026transform.routerRoot=app\u0026unstable_transformProfile=hermes-stable"
+                    },
+    "assets":  [
+
+               ],
+    "metadata":  {
+
+                 },
+    "extra":  {
+                  "eas":  {
+
+                          },
+                  "expoClient":  {
+                                     "name":  "SnapScript",
+                                     "slug":  "snapscript",
+                                     "version":  "1.0.0",
+                                     "orientation":  "portrait",
+                                     "userInterfaceStyle":  "automatic",
+                                     "platforms":  [
+                                                       "android"
+                                                   ],
+                                     "android":  {
+                                                     "package":  "com.snapscript.app",
+                                                     "versionCode":  1,
+                                                     "permissions":  [
+                                                                         "CAMERA",
+                                                                         "READ_MEDIA_IMAGES",
+                                                                         "READ_EXTERNAL_STORAGE"
+                                                                     ]
+                                                 },
+                                     "_internal":  {
+                                                       "isDebug":  false,
+                                                       "projectRoot":  "/app",
+                                                       "dynamicConfigPath":  null,
+                                                       "staticConfigPath":  "/app/app.json",
+                                                       "packageJsonPath":  "/app/package.json"
+                                                   },
+                                     "sdkVersion":  "54.0.0",
+                                     "hostUri":  "snapscript-production-e25b.up.railway.app:8081"
+                                 },
+                  "expoGo":  {
+                                 "debuggerHost":  "snapscript-production-e25b.up.railway.app:8081",
+                                 "developer":  {
+                                                   "tool":  "expo-cli",
+                                                   "projectRoot":  "/app"
+                                               },
+                                 "packagerOpts":  {
+                                                      "dev":  true
+                                                  },
+                                 "mainModuleName":  "index"
+                             },
+                  "scopeKey":  "@anonymous/snapscript-af24d05c-ba87-441d-af43-4084281c68ed"
+              }
+}

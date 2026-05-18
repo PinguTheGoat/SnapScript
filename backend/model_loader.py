@@ -19,7 +19,6 @@ TOKENIZER = AutoTokenizer.from_pretrained(str(ACTIVE_MODEL_DIR), local_files_onl
 MODEL = AutoModelForSequenceClassification.from_pretrained(
     str(ACTIVE_MODEL_DIR),
     local_files_only=True,
-    map_location="cpu",
 )
 MODEL.to(DEVICE)
 MODEL.eval()
