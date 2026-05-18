@@ -1,4 +1,4 @@
-const BACKEND_URL = 'https://YOUR_RAILWAY_URL';
+const BACKEND_URL = 'https://railway.com/project/baf9ee19-c129-4a8f-9458-2beedf4529a7?environmentId=0f96b3a0-b07a-4760-ac16-c9696e0b1a8a';
 
 export async function checkAuthorship(code, ocrType = 'unknown') {
   try {
