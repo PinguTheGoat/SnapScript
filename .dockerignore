@@ -1,0 +1,12 @@
+venv
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+build/
+dist/
+.git
+node_modules
+backend/models/
+*.ipynb
+env/
