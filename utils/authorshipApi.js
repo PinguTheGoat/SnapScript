@@ -1,4 +1,6 @@
-const BACKEND_URL = 'https://railway.com/project/baf9ee19-c129-4a8f-9458-2beedf4529a7?environmentId=0f96b3a0-b07a-4760-ac16-c9696e0b1a8a';
+// Temporary testing URL (local tunnel). Replace with your production backend when ready.
+const BACKEND_URL = 'https://proud-pots-refuse.loca.lt';
+// const BACKEND_URL = 'https://snapscript-production-e25b.up.railway.app';
 
 export async function checkAuthorship(code, ocrType = 'unknown') {
   try {
