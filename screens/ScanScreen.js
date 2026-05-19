@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, Animated, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -202,6 +202,49 @@ export default function ScanScreen({ navigation }) {
             </View>
           </View>
 
+          <View style={[styles.previewCard, { backgroundColor: theme.CARD_BG, borderColor: theme.CARD_BORDER }]}> 
+            <View style={styles.previewHeader}>
+              <View style={[styles.previewBadge, { backgroundColor: theme.ICON_BADGE_BLUE }]}> 
+                <Ionicons name="camera-outline" size={14} color={theme.ICON_COLOR_BLUE} />
+              </View>
+              <View style={styles.previewHeaderTextWrap}>
+                <Text style={[styles.previewTitle, { color: theme.TEXT_PRIMARY }]}>{selectedImageUri ? 'Photo ready' : 'Capture a photo'}</Text>
+                <Text style={[styles.previewSubtitle, { color: theme.TEXT_MUTED }]}>{selectedImageUri ? 'Review the picture, then scan or retake it.' : 'Take a picture of the code to preview it here first.'}</Text>
+              </View>
+            </View>
+
+            <View style={[styles.previewFrame, { backgroundColor: theme.IDE_HEADER, borderColor: theme.CARD_BORDER }]}> 
+              {selectedImageUri ? (
+                <Image source={{ uri: selectedImageUri }} style={styles.previewImage} resizeMode="cover" />
+              ) : (
+                <View style={styles.previewEmptyState}>
+                  <Ionicons name="image-outline" size={32} color={theme.TEXT_HINT} />
+                  <Text style={[styles.previewEmptyTitle, { color: theme.TEXT_PRIMARY }]}>No photo yet</Text>
+                  <Text style={[styles.previewEmptyText, { color: theme.TEXT_MUTED }]}>Capture a code image to see it here before scanning.</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.previewActions}>
+              <Pressable
+                style={[styles.previewActionButton, { backgroundColor: theme.GHOST_BG, borderColor: theme.GHOST_BORDER }]}
+                onPress={() => setSelectedImageUri('')}
+                disabled={!selectedImageUri}
+              >
+                <Ionicons name="refresh-outline" size={16} color={selectedImageUri ? theme.PRIMARY : theme.TEXT_HINT} />
+                <Text style={[styles.previewActionText, { color: selectedImageUri ? theme.PRIMARY : theme.TEXT_HINT }]}>Retake</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.previewActionButton, { backgroundColor: theme.PRIMARY, borderColor: theme.PRIMARY }]}
+                onPress={scanSelectedImage}
+                disabled={!selectedImageUri || processing}
+              >
+                <Ionicons name="scan-outline" size={16} color={theme.ON_PRIMARY} />
+                <Text style={[styles.previewActionText, { color: theme.ON_PRIMARY }]}>Scan now</Text>
+              </Pressable>
+            </View>
+          </View>
+
           <View style={[styles.viewfinder, { height: SCAN_BOX_HEIGHT, backgroundColor: theme.IDE_BG }]}> 
             <View style={styles.viewfinderInner}>
               <View style={[styles.cornerTopLeft, { borderColor: theme.ON_PRIMARY }]} />
@@ -369,6 +412,82 @@ export default function ScanScreen({ navigation }) {
     languageChipText: {
       fontSize: 11,
       fontWeight: '700',
+    },
+    previewCard: {
+      borderWidth: 1,
+      borderRadius: 18,
+      padding: 14,
+      gap: 12,
+    },
+    previewHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    previewBadge: {
+      width: 34,
+      height: 34,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    previewHeaderTextWrap: {
+      flex: 1,
+      gap: 2,
+    },
+    previewTitle: {
+      fontSize: 15,
+      fontWeight: '800',
+    },
+    previewSubtitle: {
+      fontSize: 12,
+      lineHeight: 16,
+      fontWeight: '500',
+    },
+    previewFrame: {
+      minHeight: 190,
+      borderWidth: 1,
+      borderRadius: 16,
+      overflow: 'hidden',
+    },
+    previewImage: {
+      width: '100%',
+      height: 190,
+    },
+    previewEmptyState: {
+      minHeight: 190,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 18,
+      gap: 8,
+    },
+    previewEmptyTitle: {
+      fontSize: 14,
+      fontWeight: '800',
+    },
+    previewEmptyText: {
+      fontSize: 12,
+      lineHeight: 17,
+      textAlign: 'center',
+      fontWeight: '500',
+    },
+    previewActions: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+    previewActionButton: {
+      flex: 1,
+      minHeight: 48,
+      borderWidth: 1,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexDirection: 'row',
+      gap: 8,
+    },
+    previewActionText: {
+      fontSize: 14,
+      fontWeight: '800',
     },
     viewfinder: {
       borderRadius: 20,
