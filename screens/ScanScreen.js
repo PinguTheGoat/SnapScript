@@ -142,7 +142,16 @@ export default function ScanScreen({ navigation }) {
         setProcessingLabel('Extracting code...');
 
         const extraction = await extractText(processedImage, GOOGLE_VISION_API_KEY, ocrMode);
-        const ocrText = String(extraction?.text || '').trim();
+        let ocrText = String(extraction?.text || '').trim();
+
+        if (!ocrText && ocrMode === 'auto') {
+          const fallbackExtraction = await extractText(processedImage, GOOGLE_VISION_API_KEY, 'printed');
+          ocrText = String(fallbackExtraction?.text || '').trim();
+          if (fallbackExtraction?.type) {
+            extraction.type = fallbackExtraction.type;
+            extraction.confidence = fallbackExtraction.confidence;
+          }
+        }
 
         if (!ocrText) {
           Alert.alert('No code detected', 'Use a clearer image with the code centered in the frame.');

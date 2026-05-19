@@ -15,7 +15,10 @@ export async function extractTextFromImage(base64Image, apiKey = GOOGLE_VISION_A
       requests: [
         {
           image: { content: base64Image },
-          features: [{ type: 'DOCUMENT_TEXT_DETECTION', maxResults: 1 }],
+          features: [
+            { type: 'DOCUMENT_TEXT_DETECTION', maxResults: 1 },
+            { type: 'TEXT_DETECTION', maxResults: 1 },
+          ],
         },
       ],
     }),
@@ -26,14 +29,25 @@ export async function extractTextFromImage(base64Image, apiKey = GOOGLE_VISION_A
   }
 
   const data = await response.json();
-  const annotation = data?.responses?.[0]?.fullTextAnnotation || {};
-  const words = collectWords(annotation);
-  const confidence = calculateAverageConfidence(words, annotation);
+  const responseData = data?.responses?.[0] || {};
+  const documentAnnotation = responseData.fullTextAnnotation || {};
+  const textAnnotation = responseData.textAnnotations?.[0] || {};
+
+  const documentWords = collectWords(documentAnnotation);
+  const textWords = collectTextWords(textAnnotation.description || '');
+
+  const documentText = String(documentAnnotation.text || '').trim();
+  const textDetectionText = String(textAnnotation.description || '').trim();
+
+  const chosenText = chooseBestText(documentText, textDetectionText);
+  const chosenWords = documentText.length >= textDetectionText.length ? documentWords : textWords;
+  const chosenAnnotation = documentText.length >= textDetectionText.length ? documentAnnotation : textAnnotation;
+  const confidence = calculateAverageConfidence(chosenWords, chosenAnnotation);
 
   return {
-    text: String(annotation.text || '').trim(),
+    text: chosenText,
     confidence,
-    words,
+    words: chosenWords,
   };
 }
 
@@ -59,6 +73,21 @@ function collectWords(annotation) {
 
 function collectWordText(word) {
   return (word?.symbols || []).map((symbol) => symbol?.text || '').join('');
+}
+
+function collectTextWords(text) {
+  return String(text || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => ({ text: word, confidence: null }));
+}
+
+function chooseBestText(documentText, textDetectionText) {
+  if (documentText && textDetectionText) {
+    return documentText.length >= textDetectionText.length ? documentText : textDetectionText;
+  }
+
+  return documentText || textDetectionText || '';
 }
 
 function calculateAverageConfidence(words, annotation) {
