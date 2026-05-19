@@ -175,7 +175,7 @@ export default function ScanScreen({ navigation }) {
           <Ionicons name="flash" size={22} color={theme.ON_PRIMARY} />
         </View>
 
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 36 }]} showsVerticalScrollIndicator={false}>
           <Pressable
             style={[styles.modePill, ocrMode === 'auto' ? styles.modePillGhost : styles.modePillActive, { backgroundColor: ocrMode === 'auto' ? theme.PILL_GHOST_BG : theme.PILL_ACTIVE_BG, borderColor: ocrMode === 'auto' ? theme.PILL_GHOST_BORDER : theme.PILL_ACTIVE_BG }]}
             onPress={cycleOcrMode}
@@ -202,57 +202,28 @@ export default function ScanScreen({ navigation }) {
             </View>
           </View>
 
-          {selectedImageUri ? (
-            <View style={[styles.previewCard, { backgroundColor: theme.CARD_BG, borderColor: theme.CARD_BORDER }]}> 
-              <View style={styles.previewHeader}>
-                <View style={[styles.previewBadge, { backgroundColor: theme.ICON_BADGE_BLUE }]}> 
-                  <Ionicons name="camera-outline" size={14} color={theme.ICON_COLOR_BLUE} />
-                </View>
-                <View style={styles.previewHeaderTextWrap}>
-                  <Text style={[styles.previewTitle, { color: theme.TEXT_PRIMARY }]}>Photo ready</Text>
-                  <Text style={[styles.previewSubtitle, { color: theme.TEXT_MUTED }]}>Review the picture, then scan or retake it.</Text>
-                </View>
-              </View>
-
-              <View style={[styles.previewFrame, { backgroundColor: theme.IDE_HEADER, borderColor: theme.CARD_BORDER }]}> 
-                <Image source={{ uri: selectedImageUri }} style={styles.previewImage} resizeMode="cover" />
-              </View>
-
-              <View style={styles.previewActions}>
-                <Pressable
-                  style={[styles.previewActionButton, { backgroundColor: theme.GHOST_BG, borderColor: theme.GHOST_BORDER }]}
-                  onPress={() => setSelectedImageUri('')}
-                >
-                  <Ionicons name="refresh-outline" size={16} color={theme.PRIMARY} />
-                  <Text style={[styles.previewActionText, { color: theme.PRIMARY }]}>Retake</Text>
-                </Pressable>
-                <Pressable
-                  style={[styles.previewActionButton, { backgroundColor: theme.PRIMARY, borderColor: theme.PRIMARY }]}
-                  onPress={scanSelectedImage}
-                  disabled={processing}
-                >
-                  <Ionicons name="scan-outline" size={16} color={theme.ON_PRIMARY} />
-                  <Text style={[styles.previewActionText, { color: theme.ON_PRIMARY }]}>Scan now</Text>
-                </Pressable>
-              </View>
-            </View>
-          ) : null}
-
           <View style={[styles.viewfinder, { height: SCAN_BOX_HEIGHT, backgroundColor: theme.IDE_BG }]}> 
             <View style={styles.viewfinderInner}>
+              {selectedImageUri ? <Image source={{ uri: selectedImageUri }} style={styles.viewfinderImage} resizeMode="cover" /> : null}
               <View style={[styles.cornerTopLeft, { borderColor: theme.ON_PRIMARY }]} />
               <View style={[styles.cornerTopRight, { borderColor: theme.ON_PRIMARY }]} />
               <View style={[styles.cornerBottomLeft, { borderColor: theme.ON_PRIMARY }]} />
               <View style={[styles.cornerBottomRight, { borderColor: theme.ON_PRIMARY }]} />
-              <Animated.View style={[styles.scanLine, { backgroundColor: theme.ON_PRIMARY, transform: [{ translateY }] }]} />
-              <Text style={[styles.viewfinderHint, { color: theme.TEXT_HINT }]}>{viewfinderHint}</Text>
+              {selectedImageUri ? null : <Animated.View style={[styles.scanLine, { backgroundColor: theme.ON_PRIMARY, transform: [{ translateY }] }]} />}
+              <Text style={[styles.viewfinderHint, { color: theme.TEXT_HINT }]}>{selectedImageUri ? 'Photo captured. Retake or scan now.' : viewfinderHint}</Text>
             </View>
           </View>
 
           <View style={styles.rowButtons}>
-            <Pressable style={[styles.ghostButton, { backgroundColor: theme.GHOST_BG, borderColor: theme.GHOST_BORDER }]} onPress={openCamera}>
-              <Ionicons name="camera-outline" size={18} color={theme.PRIMARY} />
-              <Text style={[styles.ghostButtonText, { color: theme.PRIMARY }]}>Camera</Text>
+            <Pressable
+              style={[styles.ghostButton, { backgroundColor: theme.GHOST_BG, borderColor: theme.GHOST_BORDER }]}
+              onPress={selectedImageUri ? async () => {
+                setSelectedImageUri('');
+                await openCamera();
+              } : openCamera}
+            >
+              <Ionicons name={selectedImageUri ? 'refresh-outline' : 'camera-outline'} size={18} color={theme.PRIMARY} />
+              <Text style={[styles.ghostButtonText, { color: theme.PRIMARY }]}>{selectedImageUri ? 'Retake' : 'Camera'}</Text>
             </Pressable>
             <Pressable style={[styles.ghostButton, { backgroundColor: theme.GHOST_BG, borderColor: theme.GHOST_BORDER }]} onPress={openGallery}>
               <Ionicons name="image-outline" size={18} color={theme.PRIMARY} />
@@ -263,7 +234,7 @@ export default function ScanScreen({ navigation }) {
           <Pressable
             style={[styles.primaryButton, { backgroundColor: theme.PRIMARY }]}
             onPress={scanSelectedImage}
-            disabled={processing}
+            disabled={processing || !selectedImageUri}
           >
             {processing ? <ActivityIndicator color={theme.ON_PRIMARY} /> : <Ionicons name="scan-outline" size={18} color={theme.ON_PRIMARY} />}
             <Text style={[styles.primaryButtonText, { color: theme.ON_PRIMARY }]}>SCAN CODE</Text>
@@ -337,7 +308,6 @@ export default function ScanScreen({ navigation }) {
     content: {
       padding: 16,
       gap: 14,
-      paddingBottom: 24,
     },
     modePill: {
       minHeight: 38,
@@ -361,82 +331,6 @@ export default function ScanScreen({ navigation }) {
     },
     languageCard: {
       borderWidth: 1,
-      borderRadius: 14,
-      paddingHorizontal: 14,
-      paddingVertical: 14,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-    },
-    languageLeft: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    languageIconWrap: {
-      width: 38,
-      height: 38,
-      borderRadius: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    languageIconText: {
-      fontSize: 16,
-      fontWeight: '800',
-    },
-    languageLabel: {
-      fontSize: 12,
-      fontWeight: '700',
-    },
-    languageValue: {
-      fontSize: 16,
-      fontWeight: '800',
-      marginTop: 2,
-    },
-    languageChip: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 6,
-      borderWidth: 1,
-      borderRadius: 999,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-    },
-    languageChipText: {
-      fontSize: 11,
-      fontWeight: '700',
-    },
-    previewCard: {
-      borderWidth: 1,
-      borderRadius: 18,
-      padding: 14,
-      gap: 12,
-    },
-    previewHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-    },
-    previewBadge: {
-      width: 34,
-      height: 34,
-      borderRadius: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    previewHeaderTextWrap: {
-      flex: 1,
-      gap: 2,
-    },
-    previewTitle: {
-      fontSize: 15,
-      fontWeight: '800',
-    },
-    previewSubtitle: {
-      fontSize: 12,
-      lineHeight: 16,
-      fontWeight: '500',
-    },
     previewFrame: {
       minHeight: 190,
       borderWidth: 1,
@@ -447,6 +341,11 @@ export default function ScanScreen({ navigation }) {
       width: '100%',
       height: 190,
     },
+      viewfinderImage: {
+        ...StyleSheet.absoluteFillObject,
+        width: '100%',
+        height: '100%',
+      },
     previewActions: {
       flexDirection: 'row',
       gap: 12,
@@ -550,6 +449,7 @@ export default function ScanScreen({ navigation }) {
       justifyContent: 'center',
       flexDirection: 'row',
       gap: 10,
+      marginBottom: 12,
     },
     primaryButtonText: {
       fontSize: 15,
