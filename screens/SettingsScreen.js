@@ -50,11 +50,12 @@ export default function SettingsScreen({ navigation }) {
             value={ocrModeLabel}
             onPress={cycleOcrMode}
           />
-          <SettingRow
+          <SettingThemeRow
             icon={<IconBadge backgroundColor={theme.ICON_BADGE_PURPLE} iconColor={theme.ICON_COLOR_PURPLE} iconName="color-palette-outline" />}
             title="Theme"
             value={themeLabel}
-            readOnly
+            switchValue={resolvedScheme === 'dark'}
+            onValueChange={(value) => updateSettings({ themeMode: value ? 'dark' : 'light' })}
           />
           <SettingToggleRow
             icon={<IconBadge backgroundColor={theme.ICON_BADGE_AMBER} iconColor={theme.ICON_COLOR_AMBER} iconName="notifications-outline" />}
@@ -164,6 +165,29 @@ function SettingToggleRow({ icon, title, switchValue, onValueChange }) {
   );
 }
 
+function SettingThemeRow({ icon, title, value, switchValue, onValueChange }) {
+  const theme = useTheme();
+
+  return (
+    <View style={[styles.row, { borderBottomColor: theme.PREF_ROW_BORDER }]}>
+      <View style={styles.leftSide}>
+        {icon}
+        <Text style={[styles.rowTitle, { color: theme.TEXT_PRIMARY }]}>{title}</Text>
+      </View>
+      <View style={styles.themeSide}>
+        <Text style={[styles.rowValue, { color: theme.TEXT_MUTED }]}>{value}</Text>
+        <Switch
+          trackColor={{ false: theme.CONFBAR_BG, true: theme.PRIMARY }}
+          thumbColor={switchValue ? theme.ON_PRIMARY : '#B8B8C7'}
+          ios_backgroundColor={theme.CONFBAR_BG}
+          value={switchValue}
+          onValueChange={onValueChange}
+        />
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -219,6 +243,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  themeSide: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   rowTitle: {
     fontSize: 15,

@@ -15,7 +15,11 @@ const HANDWRITING_CONFIDENCE_THRESHOLD = 0.85;
 export async function detectImageType(imageInput, googleVisionApiKey) {
   const processedImage = await ensureProcessedImage(imageInput);
   const visionResult = await extractTextFromImage(processedImage.base64 || '', googleVisionApiKey);
-  const type = visionResult.confidence < HANDWRITING_CONFIDENCE_THRESHOLD ? 'handwritten' : 'printed';
+  const type = looksLikeCode(visionResult.text)
+    ? 'printed'
+    : visionResult.confidence < HANDWRITING_CONFIDENCE_THRESHOLD
+      ? 'handwritten'
+      : 'printed';
 
   return {
     type,
@@ -121,9 +125,24 @@ async function ensureProcessedImage(imageInput) {
 function normalizeMode(mode) {
   const normalized = String(mode || 'auto').toLowerCase();
 
-  if (normalized === 'handwritten' || normalized === 'printed') {
+  if (normalized === 'handwritten' || normalized === 'printed' || normalized === 'digital') {
+    if (normalized === 'digital') {
+      return 'printed';
+    }
+
     return normalized;
   }
 
   return 'auto';
+}
+
+function looksLikeCode(text) {
+  const source = String(text || '');
+
+  if (!source.trim()) {
+    return false;
+  }
+
+  const codeSignals = [/[;{}()[\]#<>]/, /\b(class|def|function|import|return|const|let|var|public|private|static)\b/i, /[=+\-*/%]{1,2}/, /\b(if|else|for|while|try|catch|switch|case)\b/i];
+  return codeSignals.some((pattern) => pattern.test(source));
 }
