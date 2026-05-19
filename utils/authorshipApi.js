@@ -1,8 +1,8 @@
-// Use machine LAN IP so a phone on the same Wi-Fi can reach the backend.
-// Replace with your production backend when deploying.
-const BACKEND_URL = 'http://192.168.1.5:8000';
-// Temporary tunnel fallback:
-// const BACKEND_URL = 'https://proud-pots-refuse.loca.lt';
+// Use public tunnel during testing (localtunnel). Replace with production backend when deploying.
+const BACKEND_URL = 'https://rich-teams-exist.loca.lt';
+// LAN fallback:
+// const BACKEND_URL = 'http://192.168.1.5:8000';
+// Railway production fallback:
 // const BACKEND_URL = 'https://snapscript-production-e25b.up.railway.app';
 
 export async function checkAuthorship(code, ocrType = 'unknown') {
