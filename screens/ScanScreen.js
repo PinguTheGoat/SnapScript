@@ -331,38 +331,50 @@ export default function ScanScreen({ navigation }) {
     },
     languageCard: {
       borderWidth: 1,
-    previewFrame: {
-      minHeight: 190,
-      borderWidth: 1,
-      borderRadius: 16,
-      overflow: 'hidden',
-    },
-    previewImage: {
-      width: '100%',
-      height: 190,
-    },
-      viewfinderImage: {
-        ...StyleSheet.absoluteFillObject,
-        width: '100%',
-        height: '100%',
-      },
-    previewActions: {
+      borderRadius: 14,
+      paddingHorizontal: 14,
+      paddingVertical: 14,
       flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    languageLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 12,
     },
-    previewActionButton: {
-      flex: 1,
-      minHeight: 48,
-      borderWidth: 1,
+    languageIconWrap: {
+      width: 38,
+      height: 38,
       borderRadius: 12,
       alignItems: 'center',
       justifyContent: 'center',
-      flexDirection: 'row',
-      gap: 8,
     },
-    previewActionText: {
-      fontSize: 14,
+    languageIconText: {
+      fontSize: 16,
       fontWeight: '800',
+    },
+    languageLabel: {
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    languageValue: {
+      fontSize: 16,
+      fontWeight: '800',
+      marginTop: 2,
+    },
+    languageChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      borderWidth: 1,
+      borderRadius: 999,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+    },
+    languageChipText: {
+      fontSize: 11,
+      fontWeight: '700',
     },
     viewfinder: {
       borderRadius: 20,
@@ -373,6 +385,11 @@ export default function ScanScreen({ navigation }) {
       position: 'relative',
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    viewfinderImage: {
+      ...StyleSheet.absoluteFillObject,
+      width: '100%',
+      height: '100%',
     },
     cornerTopLeft: {
       position: 'absolute',
