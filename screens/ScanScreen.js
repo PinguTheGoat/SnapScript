@@ -202,48 +202,41 @@ export default function ScanScreen({ navigation }) {
             </View>
           </View>
 
-          <View style={[styles.previewCard, { backgroundColor: theme.CARD_BG, borderColor: theme.CARD_BORDER }]}> 
-            <View style={styles.previewHeader}>
-              <View style={[styles.previewBadge, { backgroundColor: theme.ICON_BADGE_BLUE }]}> 
-                <Ionicons name="camera-outline" size={14} color={theme.ICON_COLOR_BLUE} />
-              </View>
-              <View style={styles.previewHeaderTextWrap}>
-                <Text style={[styles.previewTitle, { color: theme.TEXT_PRIMARY }]}>{selectedImageUri ? 'Photo ready' : 'Capture a photo'}</Text>
-                <Text style={[styles.previewSubtitle, { color: theme.TEXT_MUTED }]}>{selectedImageUri ? 'Review the picture, then scan or retake it.' : 'Take a picture of the code to preview it here first.'}</Text>
-              </View>
-            </View>
-
-            <View style={[styles.previewFrame, { backgroundColor: theme.IDE_HEADER, borderColor: theme.CARD_BORDER }]}> 
-              {selectedImageUri ? (
-                <Image source={{ uri: selectedImageUri }} style={styles.previewImage} resizeMode="cover" />
-              ) : (
-                <View style={styles.previewEmptyState}>
-                  <Ionicons name="image-outline" size={32} color={theme.TEXT_HINT} />
-                  <Text style={[styles.previewEmptyTitle, { color: theme.TEXT_PRIMARY }]}>No photo yet</Text>
-                  <Text style={[styles.previewEmptyText, { color: theme.TEXT_MUTED }]}>Capture a code image to see it here before scanning.</Text>
+          {selectedImageUri ? (
+            <View style={[styles.previewCard, { backgroundColor: theme.CARD_BG, borderColor: theme.CARD_BORDER }]}> 
+              <View style={styles.previewHeader}>
+                <View style={[styles.previewBadge, { backgroundColor: theme.ICON_BADGE_BLUE }]}> 
+                  <Ionicons name="camera-outline" size={14} color={theme.ICON_COLOR_BLUE} />
                 </View>
-              )}
-            </View>
+                <View style={styles.previewHeaderTextWrap}>
+                  <Text style={[styles.previewTitle, { color: theme.TEXT_PRIMARY }]}>Photo ready</Text>
+                  <Text style={[styles.previewSubtitle, { color: theme.TEXT_MUTED }]}>Review the picture, then scan or retake it.</Text>
+                </View>
+              </View>
 
-            <View style={styles.previewActions}>
-              <Pressable
-                style={[styles.previewActionButton, { backgroundColor: theme.GHOST_BG, borderColor: theme.GHOST_BORDER }]}
-                onPress={() => setSelectedImageUri('')}
-                disabled={!selectedImageUri}
-              >
-                <Ionicons name="refresh-outline" size={16} color={selectedImageUri ? theme.PRIMARY : theme.TEXT_HINT} />
-                <Text style={[styles.previewActionText, { color: selectedImageUri ? theme.PRIMARY : theme.TEXT_HINT }]}>Retake</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.previewActionButton, { backgroundColor: theme.PRIMARY, borderColor: theme.PRIMARY }]}
-                onPress={scanSelectedImage}
-                disabled={!selectedImageUri || processing}
-              >
-                <Ionicons name="scan-outline" size={16} color={theme.ON_PRIMARY} />
-                <Text style={[styles.previewActionText, { color: theme.ON_PRIMARY }]}>Scan now</Text>
-              </Pressable>
+              <View style={[styles.previewFrame, { backgroundColor: theme.IDE_HEADER, borderColor: theme.CARD_BORDER }]}> 
+                <Image source={{ uri: selectedImageUri }} style={styles.previewImage} resizeMode="cover" />
+              </View>
+
+              <View style={styles.previewActions}>
+                <Pressable
+                  style={[styles.previewActionButton, { backgroundColor: theme.GHOST_BG, borderColor: theme.GHOST_BORDER }]}
+                  onPress={() => setSelectedImageUri('')}
+                >
+                  <Ionicons name="refresh-outline" size={16} color={theme.PRIMARY} />
+                  <Text style={[styles.previewActionText, { color: theme.PRIMARY }]}>Retake</Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.previewActionButton, { backgroundColor: theme.PRIMARY, borderColor: theme.PRIMARY }]}
+                  onPress={scanSelectedImage}
+                  disabled={processing}
+                >
+                  <Ionicons name="scan-outline" size={16} color={theme.ON_PRIMARY} />
+                  <Text style={[styles.previewActionText, { color: theme.ON_PRIMARY }]}>Scan now</Text>
+                </Pressable>
+              </View>
             </View>
-          </View>
+          ) : null}
 
           <View style={[styles.viewfinder, { height: SCAN_BOX_HEIGHT, backgroundColor: theme.IDE_BG }]}> 
             <View style={styles.viewfinderInner}>
@@ -453,23 +446,6 @@ export default function ScanScreen({ navigation }) {
     previewImage: {
       width: '100%',
       height: 190,
-    },
-    previewEmptyState: {
-      minHeight: 190,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: 18,
-      gap: 8,
-    },
-    previewEmptyTitle: {
-      fontSize: 14,
-      fontWeight: '800',
-    },
-    previewEmptyText: {
-      fontSize: 12,
-      lineHeight: 17,
-      textAlign: 'center',
-      fontWeight: '500',
     },
     previewActions: {
       flexDirection: 'row',
