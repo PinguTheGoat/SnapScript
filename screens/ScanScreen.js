@@ -1,25 +1,33 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, Animated, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import TextRecognition from '@react-native-ml-kit/text-recognition';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppContext } from '../utils/appContext';
 import { detectLanguage } from '../utils/languageDetector';
+import { extractText } from '../utils/ocrRouter';
+import { preprocessImage } from '../utils/imagePreprocessor';
+import { GOOGLE_VISION_API_KEY } from '../utils/googleVisionApi';
 import { useTheme } from '../utils/theme';
 
 const SCAN_BOX_HEIGHT = 292;
+const OCR_MODES = ['auto', 'handwritten', 'printed'];
 
 export default function ScanScreen({ navigation }) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const { settings, updateSettings } = useContext(AppContext);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [cameraVisible, setCameraVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [processingLabel, setProcessingLabel] = useState('');
   const [scanLine] = useState(() => new Animated.Value(0));
   const cameraRef = useRef(null);
+
+  const ocrMode = settings.ocrMode || 'auto';
 
   useEffect(() => {
     const animation = Animated.loop(
@@ -43,60 +51,6 @@ export default function ScanScreen({ navigation }) {
       animation.stop();
     };
   }, [scanLine]);
-
-  import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-  import { ActivityIndicator, Alert, Animated, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-  import { Ionicons } from '@expo/vector-icons';
-  import * as ImagePicker from 'expo-image-picker';
-  import { CameraView, useCameraPermissions } from 'expo-camera';
-  import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-  import { AppContext } from '../utils/appContext';
-  import { detectLanguage } from '../utils/languageDetector';
-  import { extractText } from '../utils/ocrRouter';
-  import { preprocessImage } from '../utils/imagePreprocessor';
-  import { GOOGLE_VISION_API_KEY } from '../utils/googleVisionApi';
-  import { useTheme } from '../utils/theme';
-
-  const SCAN_BOX_HEIGHT = 292;
-  const OCR_MODES = ['auto', 'handwritten', 'printed'];
-
-  export default function ScanScreen({ navigation }) {
-    const theme = useTheme();
-    const insets = useSafeAreaInsets();
-    const { settings, updateSettings } = useContext(AppContext);
-    const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-    const [cameraVisible, setCameraVisible] = useState(false);
-    const [selectedImageUri, setSelectedImageUri] = useState('');
-    const [processing, setProcessing] = useState(false);
-    const [processingLabel, setProcessingLabel] = useState('');
-    const [scanLine] = useState(() => new Animated.Value(0));
-    const cameraRef = useRef(null);
-
-    const ocrMode = settings.ocrMode || 'auto';
-
-    useEffect(() => {
-      const animation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(scanLine, {
-            toValue: 1,
-            duration: 1800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scanLine, {
-            toValue: 0,
-            duration: 0,
-            useNativeDriver: true,
-          }),
-        ]),
-      );
-
-      animation.start();
-
-      return () => {
-        animation.stop();
-      };
-    }, [scanLine]);
 
     const translateY = useMemo(
       () => scanLine.interpolate({
