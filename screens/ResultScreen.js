@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '900',
   },
-});
+  
   loadingWrap: {
     minHeight: 120,
     alignItems: 'center',
